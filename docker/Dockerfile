@@ -35,6 +35,7 @@ RUN pip-3.6 install python-igraph==0.9.11
 # RUN ./Miniconda3-py310_22.11.1-1-Linux-x86_64.sh -b -p $HOME/miniconda
 
 # refer https://stackoverflow.com/questions/49714499/skip-installing-confirmyes-or-no-in-dockerfile
+# this is a very big file, about 700+MB
 RUN wget 'https://repo.anaconda.com/archive/Anaconda3-2022.10-Linux-x86_64.sh'
 RUN chmod 755 ./*.sh
 RUN /bin/bash ./Anaconda3-2022.10-Linux-x86_64.sh -u -b -p /opt/conda
@@ -43,15 +44,17 @@ RUN ln -s /opt/conda/etc/profile.d/conda.sh /etc/profile.d/conda.sh
 RUN echo ". /opt/conda/etc/profile.d/conda.sh" >> ~/.bashrc 
 RUN echo "conda activate base" >> ~/.bashrc 
 
-RUN yum install -y conda
+# RUN yum install -y conda
 RUN conda create -y -n abyss-env
 RUN source /etc/profile.d/conda.sh
 RUN conda activate abyss-env
 RUN conda install -c bioconda -y abyss
 
-RUN wget "http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/blat/blat"
-RUN cp ./blat /usr/bin/blat
-RUN chmod +x /usr/bin/blat
+RUN rm -rf /usr/bin/python
+RUN ln -s /usr/bin/python3.6 /usr/bin/python
+#RUN export PATH=$PATH:/workspace/transabyss/
 
-ENTRYPOINT ["python3.6 /workspace/transabyss/transabyss"]
+RUN echo "export PATH=/usr/bin:/workspace/transabyss:$PATH" >> ~/.bashrc
+
+#ENTRYPOINT ["transabyss"]
 
